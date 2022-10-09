@@ -1,0 +1,11 @@
+;; fibonnacci
+
+    push 0
+    push 1
+.fib:
+    dup 1
+    dup 1
+    add
+    dup 0
+    print
+    jmp .fib
