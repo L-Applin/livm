@@ -11,14 +11,18 @@ public class VirtualMachine {
                               TRUE  = WORD_1;
 
     public int ip;
-    private Program programm;
-    private LinkedList<Word> stack;
+    private final Program programm;
+    private final LinkedList<Word> stack;
+
+    // @Improvement used to implements procedure call quicly, there might be a better solution
+    private final LinkedList<Word> returnStack;
 
     private boolean halt;
 
     public VirtualMachine(Program programm) {
         this.programm = programm;
         this.stack = new LinkedList<>();
+        this.returnStack = new LinkedList<>();
         this.ip = 0;
         this.halt = false;
     }
@@ -48,7 +52,7 @@ public class VirtualMachine {
 
                 case NOP -> { /* do nothing*/ }
 
-                case PUSH_INT -> stack.push(instr.operand());
+                case PUSH -> stack.push(instr.operand());
 
                 case DUP -> {
                     if (stack.isEmpty()) {
@@ -66,12 +70,10 @@ public class VirtualMachine {
                 }
 
                 case JMP -> {
-                    final int addrRel = instr.operand().word();
-                    final int addr = ip + addrRel;
-                    if (addr < 0 || addr > programm.size()) {
-                        return Trap.ILLEGAL_INSTR_ACCESS;
+                    Trap trap = doJump(instr);
+                    if (trap != Trap.OK) {
+                        return trap;
                     }
-                    this.ip = addr;
                     continue;
                 }
 
@@ -85,6 +87,21 @@ public class VirtualMachine {
                         this.ip = addr;
                         continue;
                     }
+                }
+
+                case CALL -> {
+                    int retAddr = ip;
+                    returnStack.push(new Word(retAddr));
+                    Trap trap = doJump(instr);
+                    if (trap != Trap.OK) {
+                        return trap;
+                    }
+                    continue;
+                }
+
+                case RET -> {
+                    Word retAddr = returnStack.pop();
+                    ip = retAddr.word();
                 }
 
                 case EQ -> {
@@ -134,13 +151,31 @@ public class VirtualMachine {
                     System.out.println(">>>>> " + stack.pop().word());
                 }
 
+                case HALT -> {
+                    halt = true;
+                    continue;
+                }
+
                 case DUMP -> dump();
                 default -> throw new RuntimeException(instr.type() + " not yet implemented");
+            }
+            if (Args.instance.isDebug()) {
+                dump();
             }
             ip++;
             halt = ip >= programm.size();
         }
     return Trap.OK;
+    }
+
+    private Trap doJump(Instruction instr) {
+        final int addrRel = instr.operand().word();
+        final int addr = ip + addrRel;
+        if (addr < 0 || addr > programm.size()) {
+            return Trap.ILLEGAL_INSTR_ACCESS;
+        }
+        this.ip = addr;
+        return Trap.OK;
     }
 
     private Trap wordBinop(BinaryOperator<Word> binop) {

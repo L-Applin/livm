@@ -71,13 +71,12 @@ public class Program implements Iterable<Instruction>, Serializable {
     public static Program fromAsmFile(String filename) {
         Map<String, Integer> labels = new HashMap<>();
         List<String> lines = new ArrayList<>();
-        try (FileReader reader = new FileReader(filename); Scanner scanner = new Scanner(reader))
-        {
+        try (FileReader reader = new FileReader(filename); Scanner scanner = new Scanner(reader)) {
             while (scanner.hasNextLine()) {
                 lines.add(scanner.nextLine());
             }
         } catch (IOException ioe) {
-            System.err.println("Cannot open file " + filename);
+            System.err.println("ERROR: Cannot open file " + filename);
             ioe.printStackTrace();
         }
         fromAsmFile(lines, filename, labels); // @hack, just to get all the labels, especially forward labels
@@ -186,6 +185,24 @@ public class Program implements Iterable<Instruction>, Serializable {
                     instr.add(INSTR_JNZ(new Word(label)));
                 }
 
+                case "CALL" -> {
+                    assertArgSize("CALL", 1, splits, fileName, lineNum);
+                    if (!splits[1].startsWith(".")) {
+                        instr.add(INSTR_CALL(new Word(Integer.parseInt(splits[1]))));
+                        break;
+                    }
+                    Integer label = labels.get(splits[1]);
+                    if (label != null) {
+                        label = label - instr.size();
+                    }
+                    instr.add(INSTR_CALL(new Word(label)));
+                }
+
+                case "RET" -> {
+                    assertArgSize("RET", 0, splits, fileName, lineNum);
+                    instr.add(INSTR_RET);
+                }
+
                 case "PRINT" -> {
                     assertArgSize("PRINT", 0, splits, fileName, lineNum);
                     instr.add(INSTR_PRINT);
@@ -194,6 +211,11 @@ public class Program implements Iterable<Instruction>, Serializable {
                 case "DUMP" -> {
                     assertArgSize("DUMP", 0, splits, fileName, lineNum);
                     instr.add(INSTR_DUMP);
+                }
+
+                case "HALT" -> {
+                    assertArgSize("HALT", 0, splits, fileName, lineNum);
+                    instr.add(INSTR_HALT);
                 }
 
                 default -> {
@@ -210,7 +232,7 @@ public class Program implements Iterable<Instruction>, Serializable {
 
     private static void assertArgSize(String instr, int required, String[] actuall, String filename, int line) {
         if (required != actuall.length - 1) {
-            System.err.printf("[ERROR] %s:%d - '%s' requires %d arguments but got %d ()\n",
+            System.err.printf("ERROR: %s:%d - '%s' requires %d arguments but got %d ()\n",
                     filename, line, instr, required, actuall.length - 1);
             System.exit(-1);
         }

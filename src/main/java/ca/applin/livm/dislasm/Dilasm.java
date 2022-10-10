@@ -6,44 +6,39 @@ import java.io.*;
 
 public class Dilasm {
 
-    public boolean help;
-    public String file;
-    public String outputFile;
+    public static boolean help;
+    public static String file;
+    public static String outputFile;
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            System.err.println("Missing input file");
+            System.err.println("ERROR: Missing input file");
             usage();
             System.exit(-1);
         }
-        Dilasm dilasm = new Dilasm();
-        dilasm.initArgs(args);
-        dilasm.doDisassemble();
-    }
-
-    private void doDisassemble() {
+        initArgs(args);
         Program program = Program.deserialize(file);
         try (PrintStream ps = outputFile == null
                 ? System.out
                 : new PrintStream(new FileOutputStream(outputFile))) {
             program.iterator().forEachRemaining(inst ->ps.println(inst.toAsm()));
         } catch (IOException ioe) {
-            System.err.println("ERROR encountered during dissasembly: " + ioe.getMessage());
+            System.err.println("ERROR: Encountered a problem during dissasembly: " + ioe.getMessage());
             ioe.printStackTrace();
         }
     }
 
-    private void initArgs(String[] args) {
-        this.file = args[0];
+    private static void initArgs(String[] args) {
+        file = args[0];
         if (args.length == 1) {
             return;
         }
         if (args.length != 3 || !"-o".equals(args[1])) {
-            System.err.println("Incorrect argument");
+            System.err.println("ERROR: Incorrect argument");
             usage();
             return;
         }
-        this.outputFile = args[2];
+        outputFile = args[2];
     }
 
     private static void usage() {

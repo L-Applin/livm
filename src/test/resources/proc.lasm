@@ -1,0 +1,27 @@
+;; function definition and call example
+
+;; int -> void
+
+push 1
+call .echo
+push 2
+call .echo
+push 3
+call .echo
+push 4
+call .echo
+push 5
+call .other
+halt
+
+.other
+    push 1
+    add
+    print
+    ret
+
+.echo:
+    print
+    push 68
+    call .other
+    ret
