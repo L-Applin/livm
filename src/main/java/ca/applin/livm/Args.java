@@ -6,16 +6,18 @@ import java.util.function.BiConsumer;
 public class Args {
 
     private static final String HELP_HEADER = "LIVM: the small but powerfull virtual machine!";
-    private static final String USAGE = """
+    private static final String USAGE =
+            """
             Example usage:
             Run from a asm file
-                livm -asm -f [LASM FILE]
+                livm -asm -f <LASM FILE>
 
             Run from bytecode (livm) file
-                livm -f [LIVM FILE]
+                livm -f <LIVM FILE>
 
             Compile an asm file to lism bytecode
-                livm -asm -f [INPUT LASM FILE] -o [OUTPUT LISM FILE]""";
+                livm -asm -f <INPUT LASM FILE> -o <OUTPUT LISM FILE>
+            """;
 
     public record Argument<T>(String name, String shortStr, String longStr, int argSize, String desc, Class<T> type, T defaultValue,
                               BiConsumer<Args, T> valueSetter) { };

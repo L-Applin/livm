@@ -59,7 +59,7 @@ public class Program implements Iterable<Instruction>, Serializable {
                 }
             }
         } catch (IOException ioe) {
-            System.err.printf("ERROR: could not load file %s. Cause: %s\n", in, ioe.getMessage());
+            System.err.printf("ERROR: could not load *.li file %s. Cause: %s\n", in, ioe.getMessage());
             ioe.printStackTrace();
             System.exit(-1);
             throw new RuntimeException(ioe);
@@ -127,12 +127,12 @@ public class Program implements Iterable<Instruction>, Serializable {
 
                 case "ADD" -> {
                     assertArgSize("ADD", 0, splits, fileName, lineNum);
-                    instr.add(INSTR_PLUS);
+                    instr.add(INSTR_ADD);
                 }
 
                 case "SUB" -> {
                     assertArgSize("SUB", 0, splits, fileName, lineNum);
-                    instr.add(INSTR_MINUS);
+                    instr.add(INSTR_SUB);
                 }
 
                 case "DIV" -> {
@@ -140,9 +140,9 @@ public class Program implements Iterable<Instruction>, Serializable {
                     instr.add(INSTR_DIV);
                 }
 
-                case "MULT" -> {
+                case "MUL" -> {
                     assertArgSize("MULT", 0, splits, fileName, lineNum);
-                    instr.add(INSTR_PLUS);
+                    instr.add(INSTR_ADD);
                 }
 
                 case "EQ" -> {

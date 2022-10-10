@@ -3,17 +3,43 @@ The small but powerfull Virtual machince.
 
 LIVM stands for `LISP Virtual Machine`, as this VM is first intended to interpret a LISP langage.
 
-DISCLAMER: This is a project for fun, don't expect anything from it.
+**DISCLAMER** This is a project for fun, don't expect anything from it.
 
 ASM examples can be found in the `src/test/resources` folder.
 
-### quickstart
+### Quickstart
 ```bash
-make livm
+make
 make run-asm-native
 ```
 
+This will create the `livm` native executable (see [dependencies](#Dependecies) section) and run the 
+[loop.lasm](src/test/resources/loop.lasm) file. This show that the VM can execute the assembly langage.
+
+```bash
+make lasm-to-li
+make run-li
+```
+This will compile the [loop.lasm](src/test/resources/loop.lasm) to `src/test/resources/loop.li` file and execute it. 
+This shows that the VM can execute binary `li` bytecode file.
+
+## Components
+
+### `livm`
+The Virtual machine. It can ecexute `li` bytecode or `lasm` assembly.
+
+### `li`
+Bytecode representation of a programm for the livm. Can be executed by the virtual machine.
+
+### `lasm`
+Assembly langage in a 'human-readable' format. Can be interpreted or compile to li by the virtual machine. 
+File extension: `*.lasm`
+
+
+
+
 ## Build
+
 ```bash
 mvn clean package
 ```
@@ -23,6 +49,7 @@ Or using make:
 ```bash
 make target/livm-0.0-SNAPSHOT.jar
 ```
+### dilasm
 
 
 ## Run
@@ -50,6 +77,20 @@ make livm
 You can then run the `livm` executable
 ```bash
 ./livm --help
+```
+
+## dilasm
+
+## build
+```bash
+make dilasm
+```
+
+## usage
+first compile from lasm to li, then back from li top lasm
+```bash
+./livm --asm -f src/test/resources/loop.lasm -o src/test/resources/loop.li
+./dilasm src/test/resources/loop.li
 ```
 
 ## Dependecies

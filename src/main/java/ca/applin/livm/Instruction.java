@@ -2,18 +2,25 @@ package ca.applin.livm;
 
 public record Instruction(Instruction.Type type, Word operand) {
     public enum Type {
-        NOP,
-        PUSH_INT,
-        PLUS,
-        MINUS,
-        MULT,
-        DIV,
-        DUP,
-        EQ,
-        JMP,
-        JNZ,
-        DUMP,
-        PRINT;
+        NOP("NOP"),        // byte 0x00
+        PUSH_INT("PUSH"),
+        ADD("ADD"),
+        SUB("SUB"),
+        MUL("MUL"),
+        DIV("DIV"),
+        DUP("DUP"),
+        EQ("EQ"),
+        JMP("JMP"),
+        JNZ("JNZ"),
+        DUMP("DUMP"),
+        PRINT("PRINT")      // byte 0x0B
+        ;
+
+        public final String asm;
+
+        Type(String asm) {
+            this.asm = asm;
+        }
 
         public static Type fromByte(byte b) {
             for (Type type: Type.values()) {
@@ -48,12 +55,16 @@ public record Instruction(Instruction.Type type, Word operand) {
         return type().name() + "[" + operand().toString() + "]";
     }
 
+    public String toAsm() {
+        return String.format("%s%s", type().asm, operand() == null ? "" : " " + operand().word());
+    }
+
     public static Instruction INSTR_NOP    = new Instruction(Type.NOP);
     public static Instruction INSTR_PRINT = new Instruction(Type.PRINT);
     public static Instruction INSTR_DUMP  = new Instruction(Type.DUMP);
-    public static Instruction INSTR_PLUS  = new Instruction(Type.PLUS);
-    public static Instruction INSTR_MINUS = new Instruction(Type.MINUS);
-    public static Instruction INSTR_MULT  = new Instruction(Type.MULT);
+    public static Instruction INSTR_ADD = new Instruction(Type.ADD);
+    public static Instruction INSTR_SUB = new Instruction(Type.SUB);
+    public static Instruction INSTR_MUL  = new Instruction(Type.MUL);
     public static Instruction INSTR_DIV   = new Instruction(Type.DIV);
     public static Instruction INSTR_DUP   = new Instruction(Type.DUP);
     public static Instruction INSTR_EQ    = new Instruction(Type.EQ);

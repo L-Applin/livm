@@ -15,7 +15,8 @@
 
         <maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
         <native.maven.plugin.version>0.9.6</native.maven.plugin.version>
-        <livm.main>ca.applin.livm.Main</livm.main>
+        <livm.main>ca.applin.livm.Livm</livm.main>
+        <dislasm.main>ca.applin.livm.dislasm.Dilasm</dislasm.main>
     </properties>
 
     <build>
@@ -45,7 +46,7 @@
 
     <profiles>
         <profile>
-            <id>native</id>
+            <id>livm</id>
             <build>
                 <plugins>
                     <plugin>
@@ -66,10 +67,41 @@
                             <outputDirectory>.</outputDirectory>
                             <imageName>livm</imageName>
                             <mainClass>${livm.main}</mainClass>
-                            <buildArgs combine.children="append">
-                                <buildArg>--verbose</buildArg>
-                                <buildArg>--no-fallback</buildArg>
-                            </buildArgs>
+<!--                            <buildArgs combine.children="append">-->
+<!--                                <buildArg>&#45;&#45;verbose</buildArg>-->
+<!--                                <buildArg>&#45;&#45;no-fallback</buildArg>-->
+<!--                            </buildArgs>-->
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>dilasm</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native.maven.plugin.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <outputDirectory>.</outputDirectory>
+                            <imageName>dilasm</imageName>
+                            <mainClass>${dislasm.main}</mainClass>
+<!--                            <buildArgs combine.children="append">-->
+<!--                                <buildArg>&#45;&#45;verbose</buildArg>-->
+<!--                                <buildArg>&#45;&#45;no-fallback</buildArg>-->
+<!--                            </buildArgs>-->
                         </configuration>
                     </plugin>
                 </plugins>

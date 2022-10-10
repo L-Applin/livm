@@ -14,10 +14,13 @@ public class VirtualMachine {
     private Program programm;
     private LinkedList<Word> stack;
 
+    private boolean halt;
+
     public VirtualMachine(Program programm) {
         this.programm = programm;
         this.stack = new LinkedList<>();
         this.ip = 0;
+        this.halt = false;
     }
 
     public void runOrFail() {
@@ -35,7 +38,7 @@ public class VirtualMachine {
     }
 
     public Trap run() {
-        while (ip < programm.size()) {
+        while (!halt) {
             Instruction instr = programm.getInstruction(ip);
             if (Args.instance.isDebug()) {
                 System.out.println(instr.type().name()
@@ -90,22 +93,21 @@ public class VirtualMachine {
                         return trap;
                     }
                 }
-
-                case PLUS -> {
+                case ADD -> {
                     Trap trap = wordBinop((w1, w2) ->  new Word(Math.addExact(w1.word(), w2.word())));
                     if (trap != Trap.OK) {
                         return trap;
                     }
                 }
 
-                case MINUS -> {
+                case SUB -> {
                     Trap trap = wordBinop((w1, w2) -> new Word(w1.word() - w2.word()));
                     if (trap != Trap.OK) {
                         return trap;
                     }
                 }
 
-                case MULT -> {
+                case MUL -> {
                     Trap trap = wordBinop((w1, w2) ->  new Word(w1.word() * w2.word()));
                     if (trap != Trap.OK) {
                         return trap;
@@ -136,6 +138,7 @@ public class VirtualMachine {
                 default -> throw new RuntimeException(instr.type() + " not yet implemented");
             }
             ip++;
+            halt = ip >= programm.size();
         }
     return Trap.OK;
     }
