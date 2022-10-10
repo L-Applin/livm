@@ -3,7 +3,9 @@ The small but powerfull Virtual machince.
 
 LIVM stands for `LISP Virtual Machine`, as this VM is first intended to interpret a LISP langage.
 
-DISCLAMER: This is a project for fun, dont expect anything from it.
+DISCLAMER: This is a project for fun, don't expect anything from it.
+
+ASM examples can be found in the `src/test/resources` folder.
 
 ## Build
 ```bash

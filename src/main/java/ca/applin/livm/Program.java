@@ -31,7 +31,7 @@ public class Program implements Iterable<Instruction>, Serializable {
     public void serialize(String out) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(out))) {
             for (Instruction instr: instructions) {
-                byte b = instr.type().b;
+                byte b = instr.type().asByte();
                 oos.writeByte(b);
                 Word operand = instr.operand();
                 if (operand != null) {
@@ -50,13 +50,13 @@ public class Program implements Iterable<Instruction>, Serializable {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(in))) {
             while (ois.available() > 0) {
             byte b = ois.readByte();
-            Instruction.Type type = Instruction.Type.fromByte(b);
-            if (Instruction.operandCount(type) == 0) {
-                instructions.add(new Instruction(type));
-            } else {
-                int operand = ois.readInt();
-                instructions.add(new Instruction(type, new Word(operand)));
-            }
+                Instruction.Type type = Instruction.Type.fromByte(b);
+                if (type.operandCount() == 0) {
+                    instructions.add(new Instruction(type));
+                } else {
+                    int operand = ois.readInt();
+                    instructions.add(new Instruction(type, new Word(operand)));
+                }
             }
         } catch (IOException ioe) {
             System.err.printf("ERROR: could not load file %s. Cause: %s\n", in, ioe.getMessage());
@@ -80,7 +80,7 @@ public class Program implements Iterable<Instruction>, Serializable {
             System.err.println("Cannot open file " + filename);
             ioe.printStackTrace();
         }
-        fromAsmFile(lines, filename, labels); // just to get labels
+        fromAsmFile(lines, filename, labels); // @hack, just to get all the labels, especially forward labels
         return fromAsmFile(lines, filename, labels);
     }
 
@@ -112,6 +112,10 @@ public class Program implements Iterable<Instruction>, Serializable {
             }
             switch (splits[0].toUpperCase()) {
                 case "" -> {}
+                case "NOP" -> {
+                    assertArgSize("NOP", 0, splits, fileName, lineNum);
+                    instr.add(INSTR_NOP);
+                }
                 case "PUSH" -> {
                     assertArgSize("PUSH", 1, splits, fileName, lineNum);
                     String litteral = splits[1].replace("_", "");
@@ -146,10 +150,6 @@ public class Program implements Iterable<Instruction>, Serializable {
                     instr.add(INSTR_EQ);
                 }
 
-                case "PRINT" -> {
-                    assertArgSize("PRINT", 0, splits, fileName, lineNum);
-                    instr.add(INSTR_PRINT);
-                }
 
                 case "DUP" -> {
                     if (splits.length == 1) {
@@ -186,6 +186,16 @@ public class Program implements Iterable<Instruction>, Serializable {
                     instr.add(INSTR_JNZ(new Word(label)));
                 }
 
+                case "PRINT" -> {
+                    assertArgSize("PRINT", 0, splits, fileName, lineNum);
+                    instr.add(INSTR_PRINT);
+                }
+
+                case "DUMP" -> {
+                    assertArgSize("DUMP", 0, splits, fileName, lineNum);
+                    instr.add(INSTR_DUMP);
+                }
+
                 default -> {
                     if (!splits[0].startsWith(".")) {
                         throw new RuntimeException(splits[0].toUpperCase() + " not supported (" + line + ")");
@@ -200,7 +210,6 @@ public class Program implements Iterable<Instruction>, Serializable {
 
     private static void assertArgSize(String instr, int required, String[] actuall, String filename, int line) {
         if (required != actuall.length - 1) {
-
             System.err.printf("[ERROR] %s:%d - '%s' requires %d arguments but got %d ()\n",
                     filename, line, instr, required, actuall.length - 1);
             System.exit(-1);

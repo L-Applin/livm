@@ -2,30 +2,37 @@ package ca.applin.livm;
 
 public record Instruction(Instruction.Type type, Word operand) {
     public enum Type {
-        PUSH_INT((byte) 0),
-        PLUS((byte) 1),
-        MINUS((byte) 2),
-        MULT((byte) 3),
-        DIV((byte) 4),
-        DUP((byte) 5),
-        EQ((byte) 6),
-        JMP((byte) 7),
-        JNZ((byte) 8),
-        DUMP((byte) 9),
-        PRINT((byte) 10);
-        public final byte b;
-
-        Type(byte b) {
-            this.b = b;
-        }
+        NOP,
+        PUSH_INT,
+        PLUS,
+        MINUS,
+        MULT,
+        DIV,
+        DUP,
+        EQ,
+        JMP,
+        JNZ,
+        DUMP,
+        PRINT;
 
         public static Type fromByte(byte b) {
             for (Type type: Type.values()) {
-                if (type.b == b) {
+                if (((byte) type.ordinal()) == b) {
                     return type;
                 }
             }
             throw new RuntimeException(b + " is not a valid Instruction byte.");
+        }
+
+        public byte asByte() {
+            return (byte) this.ordinal();
+        }
+
+        public int operandCount() {
+            return switch (this) {
+                case PUSH_INT, DUP, JMP, JNZ -> 1;
+                default -> 0;
+            };
         }
     }
 
@@ -41,6 +48,7 @@ public record Instruction(Instruction.Type type, Word operand) {
         return type().name() + "[" + operand().toString() + "]";
     }
 
+    public static Instruction INSTR_NOP    = new Instruction(Type.NOP);
     public static Instruction INSTR_PRINT = new Instruction(Type.PRINT);
     public static Instruction INSTR_DUMP  = new Instruction(Type.DUMP);
     public static Instruction INSTR_PLUS  = new Instruction(Type.PLUS);
@@ -66,10 +74,4 @@ public record Instruction(Instruction.Type type, Word operand) {
         return new Instruction(Type.DUP, operand);
     }
 
-    public static int operandCount(Instruction.Type type) {
-        return switch (type) {
-            case PUSH_INT, DUP, JMP, JNZ -> 1;
-            default -> 0;
-        };
-    }
 }

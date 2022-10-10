@@ -10,10 +10,8 @@ public class VirtualMachine {
     private static final Word FALSE = WORD_0,
                               TRUE  = WORD_1;
 
-    private Program programm;
-    private Instruction current;
     public int ip;
-
+    private Program programm;
     private LinkedList<Word> stack;
 
     public VirtualMachine(Program programm) {
@@ -22,28 +20,30 @@ public class VirtualMachine {
         this.ip = 0;
     }
 
-    public Instruction getCurrentInstruction() {
-        return this.current;
-    }
-
     public void runOrFail() {
         Trap trap = this.run();
         if (trap != Trap.OK) {
-            System.err.printf("Error: %s - %s ip=%d\n", trap.name(), getCurrentInstruction(), ip);
+            System.err.printf("Error: %s - %s ip=%d\n", trap.name(), programm.getInstruction(ip), ip);
+            if (Args.instance.isDebug()) {
+                dump();
+            }
             return;
         }
-        System.out.printf("%s (ip=%d)\n", trap.name(), ip);
+        if (Args.instance.isDebug()) {
+            System.out.printf("%s (ip=%d)\n", trap.name(), ip);
+        }
     }
 
     public Trap run() {
         while (ip < programm.size()) {
             Instruction instr = programm.getInstruction(ip);
-            this.current = instr;
             if (Args.instance.isDebug()) {
                 System.out.println(instr.type().name()
                         + (instr.operand() == null ? "" : " " + instr.operand()));
             }
             switch (instr.type()) {
+
+                case NOP -> { /* do nothing*/ }
 
                 case PUSH_INT -> stack.push(instr.operand());
 
@@ -69,7 +69,6 @@ public class VirtualMachine {
                         return Trap.ILLEGAL_INSTR_ACCESS;
                     }
                     this.ip = addr;
-                    dump();
                     continue;
                 }
 
@@ -81,7 +80,6 @@ public class VirtualMachine {
                     }
                     if (stack.pop().word() != 0) {
                         this.ip = addr;
-                        dump();
                         continue;
                     }
                 }
@@ -126,6 +124,7 @@ public class VirtualMachine {
                     stack.push(new Word(fst.word() / snd.word()));
                 }
 
+                // intrisics
                 case PRINT -> {
                     if (stack.isEmpty()) {
                         return Trap.STACK_UNDERFLOW;
@@ -136,7 +135,6 @@ public class VirtualMachine {
                 case DUMP -> dump();
                 default -> throw new RuntimeException(instr.type() + " not yet implemented");
             }
-            dump();
             ip++;
         }
     return Trap.OK;
@@ -158,9 +156,6 @@ public class VirtualMachine {
 
 
     public void dump() {
-        if (!Args.instance.isDebug()) {
-            return;
-        }
         System.out.println("Stack:");
         if (stack.isEmpty()) {
             System.out.println("    [EMPTY]");

@@ -5,7 +5,10 @@ public class Main {
         Args.init(args);
         String file = Args.instance.getFile();
 
-        System.out.println("Running file " + file);
+        if (Args.instance.isDebug()) {
+            System.out.println("Running file " + file);
+        }
+
         Program programm = Args.instance.isAsm()
                 ? Program.fromAsmFile(file)
                 : Program.deserialize(file);
