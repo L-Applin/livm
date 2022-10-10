@@ -7,18 +7,34 @@ DISCLAMER: This is a project for fun, don't expect anything from it.
 
 ASM examples can be found in the `src/test/resources` folder.
 
+### quickstart
+```bash
+make livm
+make run-asm-native
+```
+
 ## Build
 ```bash
 mvn clean package
 ```
+Will build an executable jar.
 
-Will build an executable jar 
+Or using make:
+```bash
+make target/livm-0.0-SNAPSHOT.jar
+```
+
 
 ## Run
 ```
-./run.sh --asm -f src/test/resources/fib.lasm
+java -jar target/livm-0.0-SNAPSHOT.jar --asm -f src/test/resources/loop.lasm
 ```
 Will compile to a jar file and run it.
+
+Or using make:
+```bash
+make run-asm [file=FILENAME]
+```
 
 ## Native image
 ```
@@ -26,8 +42,14 @@ mvn clean package -P native
 ```
 Will compile to a native image (quite slow). It can then be run just by calling the `livm` executable created
 
+Or using make:
 ```bash
-./livm --asm -f src/test/resources/fib.lasm
+make livm
+```
+
+You can then run the `livm` executable
+```bash
+./livm --help
 ```
 
 ## Dependecies

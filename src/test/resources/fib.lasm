@@ -8,5 +8,4 @@
     add
     dup 0
     print
-    dump
     jmp .fib
