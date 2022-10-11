@@ -1,7 +1,5 @@
 ;; function definition and call example
 
-;; int -> void
-
 push 1
 call .echo
 push 2

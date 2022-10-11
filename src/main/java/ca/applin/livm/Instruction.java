@@ -1,10 +1,14 @@
 package ca.applin.livm;
 
-public record Instruction(Instruction.Type type, Word operand) {
+public class Instruction {
+
     public enum Type {
         NOP("NOP"),        // byte 0x00
         HALT("HALT"),
         PUSH("PUSH"),
+        MEM("MEM"),
+        STR("STR"),
+        LOAD("LOAD"),
         ADD("ADD"),
         SUB("SUB"),
         MUL("MUL"),
@@ -46,6 +50,14 @@ public record Instruction(Instruction.Type type, Word operand) {
         }
     }
 
+    public Instruction.Type type;
+    public Word operand;
+
+    public Instruction(Type type, Word word) {
+        this.type = type;
+        this.operand = word;
+    }
+
     public Instruction(Type type) {
         this(type, null);
     }
@@ -55,11 +67,11 @@ public record Instruction(Instruction.Type type, Word operand) {
         if (operand == null) {
             return type.name();
         }
-        return type().name() + "[" + operand().toString() + "]";
+        return type.name() + "[" + operand.toString() + "]";
     }
 
     public String toAsm() {
-        return String.format("%s%s", type().asm, operand() == null ? "" : " " + operand().word());
+        return String.format("%s%s", type.asm, operand == null ? "" : " " + operand.word());
     }
 
     public static Instruction INSTR_NOP   = new Instruction(Type.NOP);

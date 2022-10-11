@@ -1,0 +1,19 @@
+;; Memory example
+;; load instruction dereference an address from a label
+
+.msg:  str "Hello World!"
+.data: mem 0xCA 0xFE 0xBA 0xBE
+
+call .main
+halt
+
+.main
+    load .msg       ; byte 'H' is on the stack
+    print           ; >>> H
+    push .msg       ; push 0 (address/pointer of .msg)
+    print
+    load .data      ; byte '-xCA' is on the stack
+    print           ; >>> H
+    push .data      ; push 12 (address/pointer of .data) or 13 (NULL terminated) or 16 (add 4 byte for str len before string?)
+    print
+    ret

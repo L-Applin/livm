@@ -1,5 +1,6 @@
 package ca.applin.livm;
 
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.function.BinaryOperator;
 
@@ -7,6 +8,7 @@ import static ca.applin.livm.Word.WORD_0;
 import static ca.applin.livm.Word.WORD_1;
 
 public class VirtualMachine {
+    private static final int DEFAULT_MEMORY_SEGMENT_SIZE = 1024 * 1024; // 1 MB
     private static final Word FALSE = WORD_0,
                               TRUE  = WORD_1;
 
@@ -17,6 +19,9 @@ public class VirtualMachine {
     // @Improvement used to implements procedure call quicly, there might be a better solution
     private final LinkedList<Word> returnStack;
 
+    // Memery segement
+    private ByteBuffer mem;
+
     private boolean halt;
 
     public VirtualMachine(Program programm) {
@@ -25,6 +30,7 @@ public class VirtualMachine {
         this.returnStack = new LinkedList<>();
         this.ip = 0;
         this.halt = false;
+        this.mem = ByteBuffer.allocate(DEFAULT_MEMORY_SEGMENT_SIZE);
     }
 
     public void runOrFail() {
@@ -45,23 +51,23 @@ public class VirtualMachine {
         while (!halt) {
             Instruction instr = programm.getInstruction(ip);
             if (Args.instance.isDebug()) {
-                System.out.println(instr.type().name()
-                        + (instr.operand() == null ? "" : " " + instr.operand()));
+                System.out.println(instr.type.name()
+                        + (instr.operand == null ? "" : " " + instr.operand));
             }
-            switch (instr.type()) {
+            switch (instr.type) {
 
                 case NOP -> { /* do nothing*/ }
 
-                case PUSH -> stack.push(instr.operand());
+                case PUSH -> stack.push(instr.operand);
 
                 case DUP -> {
                     if (stack.isEmpty()) {
                         return Trap.STACK_UNDERFLOW;
                     }
-                    if (instr.operand() == null) {
+                    if (instr.operand == null) {
                         stack.push(stack.peek());
                     } else {
-                        int addr = instr.operand().word();
+                        int addr = instr.operand.word();
                         if (addr > stack.size() - 1) {
                             return Trap.STACK_UNDERFLOW;
                         }
@@ -78,8 +84,7 @@ public class VirtualMachine {
                 }
 
                 case JNZ -> {
-                    final int addrRel = instr.operand().word();
-                    final int addr = ip + addrRel;
+                    final int addr = instr.operand.word();
                     if (addr < 0 || addr > programm.size()) {
                         return Trap.ILLEGAL_INSTR_ACCESS;
                     }
@@ -157,7 +162,7 @@ public class VirtualMachine {
                 }
 
                 case DUMP -> dump();
-                default -> throw new RuntimeException(instr.type() + " not yet implemented");
+                default -> throw new RuntimeException(instr.type + " not yet implemented");
             }
             if (Args.instance.isDebug()) {
                 dump();
@@ -169,8 +174,7 @@ public class VirtualMachine {
     }
 
     private Trap doJump(Instruction instr) {
-        final int addrRel = instr.operand().word();
-        final int addr = ip + addrRel;
+        final int addr = instr.operand.word();
         if (addr < 0 || addr > programm.size()) {
             return Trap.ILLEGAL_INSTR_ACCESS;
         }
