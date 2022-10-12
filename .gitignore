@@ -1,7 +1,9 @@
 target
 livm
-livm.build_artifacts.txt
-.idea
+lasm
 dilasm
+livm.build_artifacts.txt
+lasm.build_artifacts.txt
 dilasm.build_artifacts.txt
+.idea
 *.li

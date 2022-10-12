@@ -1,15 +1,20 @@
 ;; loop example
-    push 10
-    push 0
+    push 10       ;; limit
+    push 0        ;; initial value
 .loop:
-    dup
-    print
-    dup 1         ;; duplicate the head of the stack
-    dup 1         ;; put the element at index 2 (3rd from the head) back at the head
+    call .do-loop
+    dup 1
+    dup 1
     eq
-    jnz 4         ;; realtive addr, 4 forward
+    jnz .end-loop
     push 1
     add
-    jmp .loop     ;; jump to label
-    push 69       ;; after loop ends
+    jmp .loop
+.end-loop
+    push 69
     print
+    halt
+.do-loop
+   dup
+   print
+   ret

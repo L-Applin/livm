@@ -1,12 +1,21 @@
 package ca.applin.livm.dislasm;
 
-import ca.applin.livm.Program;
+import ca.applin.livm.core.Program;
 
 import java.io.*;
+import java.util.HexFormat;
 
 public class Dilasm {
 
-    public static boolean help;
+    private static void usage() {
+        System.out.println(
+                """
+                usage:
+                dilasm <INPUT FILE> [-o <OUTPUT FILE>]
+                """
+        );
+    }
+
     public static String file;
     public static String outputFile;
 
@@ -22,6 +31,8 @@ public class Dilasm {
                 ? System.out
                 : new PrintStream(new FileOutputStream(outputFile))) {
             program.iterator().forEachRemaining(inst ->ps.println(inst.toAsm()));
+            ps.println(";; data section");
+            ps.println(HexFormat.ofDelimiter(" ").formatHex(program.getDataSection().array()));
         } catch (IOException ioe) {
             System.err.println("ERROR: Encountered a problem during dissasembly: " + ioe.getMessage());
             ioe.printStackTrace();
@@ -41,12 +52,4 @@ public class Dilasm {
         outputFile = args[2];
     }
 
-    private static void usage() {
-        System.out.println(
-                """
-                usage:
-                dilasm <INPUT FILE> [-o <OUTPUT FILE>]
-                """
-        );
-    }
 }

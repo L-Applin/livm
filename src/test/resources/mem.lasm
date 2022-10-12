@@ -1,19 +1,25 @@
 ;; Memory example
 ;; load instruction dereference an address from a label
 
-.msg:  str "Hello World!"
-.data: mem 0xCA 0xFE 0xBA 0xBE
+.hello: str "Hello, "   ;; puts the byte of the string "hello "
+.world: str "World!!!"
 
 call .main
 halt
 
 .main
-    load .msg       ; byte 'H' is on the stack
-    print           ; >>> H
-    push .msg       ; push 0 (address/pointer of .msg)
+    ;; .hello represents the address in the data section of the string "Hello "
+    ;; this instruction will load an int that represents the size of the data .hello points to, in this case 7
+    load .hello
+    push .hello
     print
-    load .data      ; byte '-xCA' is on the stack
-    print           ; >>> H
-    push .data      ; push 12 (address/pointer of .data) or 13 (NULL terminated) or 16 (add 4 byte for str len before string?)
+    load .world
+    print
+
+    ;; this instruction will push an int that represents the address of the .hello section in the data section.
+    ;; At this addresse will be the int (4 byte) representing the size of the .hello section
+    push .hello
+    print
+    push .world
     print
     ret

@@ -25,16 +25,18 @@ This shows that the VM can execute binary `li` bytecode file.
 
 ## Components
 
-### `livm`
-The Virtual machine. It can ecexute `li` bytecode or `lasm` assembly.
+### `./livm`
+The Virtual machine. It can ecexute `li` bytecode.
 
-### `li`
-Bytecode representation of a programm for the livm. Can be executed by the virtual machine.
-
-### `lasm`
+### `./lasm`
 Assembly langage in a 'human-readable' format. Can be interpreted or compile to li by the virtual machine. 
 File extension: `*.lasm`
 
+### `./dilasm`
+Disassembler 
+
+### `*.li` files
+Bytecode representation of a programm for the livm. Can be executed by the virtual machine.
 
 
 
@@ -63,11 +65,14 @@ Or using make:
 make run-asm [file=FILENAME]
 ```
 
-## Native image
+## Native images
+`livm` `lasm` and `dilasm` native executable can be compiled maven profiles:
 ```
-mvn clean package -P native
+mvn clean package -P livm
+mvn clean package -P lasm 
+mvn clean package -P dilasm 
 ```
-Will compile to a native image (quite slow). It can then be run just by calling the `livm` executable created
+Will compile to a native image (quite slow).
 
 Or using make:
 ```bash

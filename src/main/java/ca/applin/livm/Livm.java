@@ -1,22 +1,20 @@
 package ca.applin.livm;
 
+import ca.applin.livm.core.Parameters;
+import ca.applin.livm.core.Program;
+import ca.applin.livm.core.VirtualMachine;
+
 public class Livm {
     public static void main(String[] args) {
-        Args.init(args);
-        String file = Args.instance.getFile();
+        LivmArgs.init(args);
+        String file = LivmArgs.instance.getFile();
 
-        if (Args.instance.isDebug()) {
+        if (LivmArgs.instance.isDebug()) {
             System.out.println("Running file " + file);
         }
 
-        Program programm = Args.instance.isAsm()
-                ? Program.fromAsmFile(file)
-                : Program.deserialize(file);
-        if (Args.instance.isAsm() && Args.instance.getOutputFile() != null) {
-            programm.serialize(Args.instance.getOutputFile());
-            System.exit(0);
-        }
-        VirtualMachine machineFromFile = new VirtualMachine(programm);
+        Program programm = Program.deserialize(file);
+        VirtualMachine machineFromFile = new VirtualMachine(programm, new Parameters(LivmArgs.instance.isDebug()));
         machineFromFile.runOrFail();
     }
 
