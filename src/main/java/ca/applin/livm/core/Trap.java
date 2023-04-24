@@ -1,0 +1,12 @@
+package ca.applin.livm.core;
+
+public enum Trap {
+    OK,
+    STACK_OVERFLOW,
+    STACK_UNDERFLOW,
+    DIVISION_BY_ZERO,
+    ARITHMETIC_OVERFLOW,
+    ILLEGAL_INSTR_ACCESS,
+    ILLEGAL_MEMORY_ACCESS,
+    OUT_OF_MEMORY
+}

@@ -1,6 +1,6 @@
 ;; loop example
-    push 10       ;; limit
-    push 0        ;; initial value
+    push 10       ;; limit         (i < 10)
+    push 0        ;; initial value (int i = 0)
 .loop:
     call .do-loop
     dup 1
@@ -8,12 +8,13 @@
     eq
     jnz .end-loop
     push 1
-    add
+    add         ;; i += 1
     jmp .loop
 .end-loop
     push 69
     print
     halt
+
 .do-loop
    dup
    print

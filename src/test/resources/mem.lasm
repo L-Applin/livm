@@ -5,21 +5,34 @@
 .world: str "World!!!"
 
 call .main
+dump
 halt
 
 .main
     ;; .hello represents the address in the data section of the string "Hello "
-    ;; this instruction will load an int that represents the size of the data .hello points to, in this case 7
+    ;; the load instruction will put an int on the stack that represents the size of the data .hello points to, in this case 7
     load .hello
     push .hello
     print
-    load .world
     print
 
     ;; this instruction will push an int that represents the address of the .hello section in the data section.
     ;; At this addresse will be the int (4 byte) representing the size of the .hello section
-    push .hello
-    print
+    load .world
     push .world
+    print
+    print
+
+    ;; allocate new memory at runtime
+    mem 128     ;; allocate 128 bytes and push the adress on the stack
+    dup
+    print
+    dup
+    dup
+    mov 42      ;; take 42 and save it at the adress pointed by the top of the stack
+    push 4
+    add
+    mov 69, rdx
+    read
     print
     ret

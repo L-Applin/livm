@@ -10,7 +10,7 @@ ASM examples can be found in the `src/test/resources` folder.
 ### Quickstart
 ```bash
 make
-make run-asm-native
+make run-native
 ```
 
 This will create the `livm` native executable (see [dependencies](#Dependecies) section) and run the 
